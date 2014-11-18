@@ -18,87 +18,89 @@ function Construct(options, callback) {
   self._apos.mixinModuleAssets(self, 'rssFeed', __dirname, options);
   self.route = self._options.route || '/apos-global-rss-feed/';
 
-	self.render = function(name, data) {
-   	return self._apos.partial(name, data, __dirname + '/views');
+  self.render = function(name, data) {
+    return self._apos.partial(name, data, __dirname + '/views');
   };
 
   self.whitelistResources = function(resource) {
-  	var good = ['tag', 'id', 'slug'];
-  	return _.contains(good, resource);
+    var good = ['tag', 'id', 'slug'];
+    return _.contains(good, resource);
   }
 
   self._app.get(self.route + '*', function(req, res) {
-  	var resource, projection, criteria;
+    var resource, projection, criteria;
 
-  	// parse request
-  	var path = req.url.split('/');
-  	path.shift();
-  	path.shift();
-		resource = path[0];
-		path.shift();
-		projection = path[0];
+    // parse request
+    var path = req.url.split('/');
+    path.shift();
+    path.shift();
+    resource = path[0];
+    path.shift();
+    projection = path[0];
 
-		// method whitelist check. if its not here, beat it
-  	if (self.whitelistResources(resource) === false) {
-  		res.statusCode = 405;
-			return res.send('405 Method Not Allowed');
-  	}
+    // method whitelist check. if its not here, beat it
+    if (self.whitelistResources(resource) === false) {
+      res.statusCode = 405;
+      return res.send('405 Method Not Allowed');
+    }
 
-  	// Check for identifier
-  	if (!projection) {
-  		res.statusCode = 400;
-			return res.send('400 Bad Request. Need an identifier');
-  	}
+    // Check for identifier
+    if (!projection) {
+      res.statusCode = 400;
+      return res.send('400 Bad Request. Need an identifier');
+    }
 
-		// un-sluggify tags
-		if (resource === 'tag' && projection) {
-			projection = projection.replace('-', ' ');
-		}
-		
-  	// convert resources to mongo'y stuff
-  	if (resource === 'tag') { resource = 'tags'; }
-  	if (resource === 'id') { resource = '_id'; }
+    // un-sluggify tags
+    if (resource === 'tag' && projection) {
+      projection = projection.replace('-', ' ');
+    }
+    
+    // convert resources to mongo'y stuff
+    if (resource === 'tag') { resource = 'tags'; }
+    if (resource === 'id') { resource = '_id'; }
 
 
-  	// setup criteria object
-  	criteria = {};
-  	if (resource === 'tags') {
-  		criteria[resource] = {$in: [projection]};
-  	} else {
-  		criteria[resource] = projection;
-  	}
-  	
+    // setup criteria object
+    criteria = {};
+    if (resource === 'tags') {
+      criteria[resource] = {$in: [projection]};
+    } else {
+      criteria[resource] = projection;
+    }
+    
 
-  	// go get
-  	self._apos.get(req, criteria, function(err, results) {
-	
-			if (err) {
-				return callback(err);
-			}
+    // go get
+    self._apos.get(req, criteria, function(err, results) {
+  
+      if (err) {
+        return callback(err);
+      }
 
-			// create a feed object
-			var feed = new rss({
-				title: self._app.locals.siteTitle,
-				description: self._options.description || null,
-				site_url: 'http://' + self._app.locals.hostName,
-				feed_url: 'http://' + self._app.locals.hostName + req.url
-			});
+      // create a feed object
+      var feed = new rss({
+        title: self._app.locals.siteTitle,
+        description: self._options.description || null,
+        site_url: 'http://' + self._app.locals.hostName,
+        feed_url: 'http://' + self._app.locals.hostName + req.url
+      });
 
-			// loop page results and add them to the feed object
-			results.pages.forEach(function(page) {
-				feed.item({
-					title: page.title,
-					description: page.searchSummary,
-					categories: page.tags,
-					url: 'http://' + self._app.locals.hostName + '/apos-pages/search-result/?slug=' + page.slug
-				});
-			})
+      // console.log(req);
 
-			// send to browser
-			res.set('Content-Type', 'text/xml');
-			return res.send(feed.xml());
-  	});
-	});
+      // loop page results and add them to the feed object
+      results.pages.forEach(function(page) {
+        feed.item({
+          title: page.title,
+          description: page.searchSummary,
+          categories: page.tags,
+          url: 'http://' + req.headers.host + '/apos-pages/search-result/?slug=' + page.slug
+        });
+      })
+
+      // send to browser
+      res.set('Content-Type', 'text/xml');
+      return res.send(feed.xml());
+    });
+  });
 
 
   // Invoke the callback. This must happen on next tick or later!
