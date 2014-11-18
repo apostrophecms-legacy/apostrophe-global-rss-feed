@@ -1,0 +1,24 @@
+{
+  "name": "apostrophe-rss-feed",
+  "version": "0.5.1",
+  "description": "Adds a route to your site that performs a app.get and returns an XML feed of the results",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "apostrophe",
+    "RSS",
+    "feed"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/punkave/apostrophe-rss-feed.git"
+  },
+  "author": "P'unk Avenue punkave.com",
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "^2.4.1",
+    "rss": "^1.0.1"
+  }
+}
