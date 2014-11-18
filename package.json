@@ -1,7 +1,7 @@
 {
-  "name": "apostrophe-rss-feed",
+  "name": "apostrophe-global-rss-feed",
   "version": "0.5.1",
-  "description": "Adds a route to your site that performs a app.get and returns an XML feed of the results",
+  "description": "Adds a route to your site that performs an apos.get and returns an XML feed of the results",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -13,12 +13,17 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/punkave/apostrophe-rss-feed.git"
+    "url": "git://github.com/punkave/apostrophe-global-rss-feed.git"
   },
   "author": "P'unk Avenue punkave.com",
   "license": "MIT",
   "dependencies": {
     "lodash": "^2.4.1",
     "rss": "^1.0.1"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/punkave/apostrophe-global-rss-feed/issues"
+  },
+  "homepage": "https://github.com/punkave/apostrophe-global-rss-feed",
+  "devDependencies": {}
 }
