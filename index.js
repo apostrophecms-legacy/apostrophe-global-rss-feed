@@ -79,18 +79,27 @@ function Construct(options, callback) {
       // create a feed object
       var feed = new rss({
         title: self._app.locals.siteTitle,
+        generator: 'Apostrpohe 2',
         description: self._options.description || null,
         site_url: 'http://' + self._app.locals.hostName,
         feed_url: 'http://' + self._app.locals.hostName + req.url
       });
 
+      // console.log(self._apos._aposLocals);
       // console.log(req);
 
       // loop page results and add them to the feed object
       results.pages.forEach(function(page) {
+        // console.log(page);
+        var description;
+        if (page.areas.body) { // bc for 0.4
+          description = self._apos._aposLocals.aposAreaContent(page.areas.body.items, {allowed:['video', 'richText', 'slideshow', 'blockquote']});
+        } else {
+          description = self._apos._aposLocals.aposAreaContent(page.body.items, {allowed:['video', 'richText', 'slideshow', 'blockquote']});
+        }
         feed.item({
           title: page.title,
-          description: page.searchSummary,
+          description: description,
           categories: page.tags,
           url: 'http://' + req.headers.host + '/apos-pages/search-result/?slug=' + page.slug
         });
