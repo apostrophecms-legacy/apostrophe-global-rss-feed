@@ -1,6 +1,6 @@
 {
   "name": "apostrophe-global-rss-feed",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "description": "Adds a route to your site that performs an apos.get and returns an XML feed of the results",
   "main": "index.js",
   "scripts": {
