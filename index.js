@@ -29,6 +29,9 @@ function Construct(options, callback) {
 
   self._app.get(self.route + '*', function(req, res) {
     var resource, projection, criteria;
+    var options = {};
+    options.sort = self._options.sort || { start: -1, publishedAt: -1, createdAt: -1 };
+    options.limit = self._apos.sanitizeInteger(self._options.limit) || 100;
 
     // parse request
     var path = req.url.split('/');
@@ -70,7 +73,7 @@ function Construct(options, callback) {
     
 
     // go get
-    self._apos.get(req, criteria, function(err, results) {
+    self._apos.get(req, criteria, options, function(err, results) {
   
       if (err) {
         return callback(err);
@@ -85,22 +88,23 @@ function Construct(options, callback) {
         feed_url: 'http://' + self._app.locals.hostName + req.url
       });
 
-      // console.log(self._apos._aposLocals);
-      // console.log(req);
-
       // loop page results and add them to the feed object
       results.pages.forEach(function(page) {
-        // console.log(page);
+
         var description;
         if (page.areas.body) { // bc for 0.4
           description = self._apos._aposLocals.aposAreaContent(page.areas.body.items, {allowed:['video', 'richText', 'slideshow', 'blockquote']});
-        } else {
+        }
+
+        if (page.body) {
           description = self._apos._aposLocals.aposAreaContent(page.body.items, {allowed:['video', 'richText', 'slideshow', 'blockquote']});
         }
+
         feed.item({
           title: page.title,
           description: description,
           categories: page.tags,
+          date: page.publishedAt || page.start || page.createdAt,
           url: 'http://' + req.headers.host + '/apos-pages/search-result/?slug=' + page.slug
         });
       })

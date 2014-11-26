@@ -15,6 +15,8 @@ var site = require('apostrophe-site')({
     'apostrophe-global-rss-feed': {
       description: 'foo' // optional description attached to all feeds
       route: '/feed/' // optional route where the feeds like, default is /apos-global-rss-feed/
+      sort: { start: -1, publishedAt: -1, createdAt: -1 } // optional, mongo sort object, default { start: -1, publishedAt: -1, createdAt: -1 }
+      limit: 50 // optional, integer limit, default 100
     },
 	}
 })
