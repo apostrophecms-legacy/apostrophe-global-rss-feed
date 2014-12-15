@@ -2,6 +2,7 @@ module.exports = factory;
 
 var rss = require('rss');
 var _ = require('lodash');
+var $ = require('cheerio');
 
 function factory(options, callback) {
   return new Construct(options, callback);
@@ -25,7 +26,22 @@ function Construct(options, callback) {
   self.whitelistResources = function(resource) {
     var good = ['tag', 'id', 'slug'];
     return _.contains(good, resource);
-  }
+  };
+
+  self.getVideoUrls = function(items){
+    var videos = [];
+    var videoUrls = [];
+
+    videos = _.filter(items, function(item){
+      return item.type === 'video';
+    });
+
+    videos.forEach(function(video) { 
+      videoUrls.push(video.video);
+    });
+
+    return videoUrls;
+  };
 
   self._app.get(self.route + '*', function(req, res) {
     var resource, projection, criteria;
@@ -87,18 +103,36 @@ function Construct(options, callback) {
         site_url: 'http://' + self._app.locals.hostName,
         feed_url: 'http://' + self._app.locals.hostName + req.url
       });
+      // console.log(self._apos._aposLocals);
 
       // loop page results and add them to the feed object
       results.pages.forEach(function(page) {
 
         var description;
+        var videoUrls = [];
+
         if (page.areas.body) { // bc for 0.4
-          description = self._apos._aposLocals.aposAreaContent(page.areas.body.items, {allowed:['video', 'richText', 'slideshow', 'blockquote']});
+          description = self._apos._aposLocals.aposAreaContent(page.areas.body.items, {allowed:['richText', 'slideshow', 'blockquote']});
+          videoUrls = self.getVideoUrls(page.areas.body.items);
         }
 
         if (page.body) {
-          description = self._apos._aposLocals.aposAreaContent(page.body.items, {allowed:['video', 'richText', 'slideshow', 'blockquote']});
+          description = self._apos._aposLocals.aposAreaContent(page.body.items, {allowed:['richText', 'slideshow', 'blockquote']});
+          videoUrls = self.getVideoUrls(page.body.items);
         }
+
+        if (videoUrls.length) {
+          var videoEmbeds;
+          var embedString = '<iframe width="854" height="510" src frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>'
+          videoUrls.forEach(function(video) {
+            console.log(video);
+            var t = embedString.replace(/src/gi, 'src="' + video + '"');
+            videoEmbeds = videoEmbeds + t;
+          });
+        }
+
+        description = description.concat(description, videoEmbeds);
+
 
         feed.item({
           title: page.title,
