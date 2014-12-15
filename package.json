@@ -1,6 +1,6 @@
 {
   "name": "apostrophe-global-rss-feed",
-  "version": "0.5.5",
+  "version": "0.5.6",
   "description": "Adds a route to your site that performs an apos.get and returns an XML feed of the results",
   "main": "index.js",
   "scripts": {
@@ -20,7 +20,7 @@
   "dependencies": {
     "lodash": "^2.4.1",
     "rss": "^1.0.1",
-    "cheerio": "^0.18.0" 
+    "cheerio": "^0.18.0"
   },
   "bugs": {
     "url": "https://github.com/punkave/apostrophe-global-rss-feed/issues"
