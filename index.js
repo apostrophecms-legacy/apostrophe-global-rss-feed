@@ -148,11 +148,12 @@ function Construct(options, callback) {
           var videoEmbeds = self.getVideoEmbeds(videoUrls);
         }
 
-        description = description.concat(videoEmbeds);
+        // description = description.concat(videoEmbeds);
 
         feed.item({
           title: page.title,
           description: description,
+          video: videoUrls,
           categories: page.tags,
           date: page.publishedAt || page.start || page.createdAt,
           url: 'http://' + req.headers.host + '/apos-pages/search-result/?slug=' + page.slug
