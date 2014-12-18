@@ -43,6 +43,28 @@ function Construct(options, callback) {
     return videoUrls;
   };
 
+  self.getVideoEmbeds = function(urls) {
+    var embeds = [];
+
+    urls.forEach(function(url) {
+      var embedStr = '<iframe width="854" height="510" src frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+
+      if (url.match(/youtube/gi)) {
+        var videoUrl = '//www.youtube.com/embed/' + url.split('v=')[1];
+        embedStr = embedStr.replace(/src/gi, 'src="' + videoUrl + '"');
+      } else if(url.match(/vimeo/gi)) {
+        var videoUrl = '//player.vimeo.com/video/VIDEOID?badge=0&amp;color=ffffff';
+        videoUrl = videoUrl.replace(/VIDEOID/gi, url.split('com/')[1]);
+        embedStr = embedStr.replace(/src/gi, 'src="' + videoUrl + '"');
+      } else {
+        embedStr = embedStr.replace(/src/gi, 'src="' + url + '"');
+      }
+      embeds.push(embedStr);
+    });
+
+    return embeds;
+  }
+
   self._app.get(self.route + '*', function(req, res) {
     var resource, projection, criteria;
     var options = {};
@@ -98,7 +120,7 @@ function Construct(options, callback) {
       // create a feed object
       var feed = new rss({
         title: self._app.locals.siteTitle,
-        generator: 'Apostrpohe 2',
+        generator: 'Apostrophe 2',
         description: self._options.description || null,
         site_url: 'http://' + self._app.locals.hostName,
         feed_url: 'http://' + self._app.locals.hostName + req.url
@@ -121,18 +143,12 @@ function Construct(options, callback) {
           videoUrls = self.getVideoUrls(page.body.items);
         }
 
+
         if (videoUrls.length) {
-          var videoEmbeds;
-          var embedString = '<iframe width="854" height="510" src frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>'
-          videoUrls.forEach(function(video) {
-            console.log(video);
-            var t = embedString.replace(/src/gi, 'src="' + video + '"');
-            videoEmbeds = videoEmbeds + t;
-          });
+          var videoEmbeds = self.getVideoEmbeds(videoUrls);
         }
 
-        description = description.concat(description, videoEmbeds);
-
+        description = description.concat(videoEmbeds);
 
         feed.item({
           title: page.title,
