@@ -132,6 +132,7 @@ function Construct(options, callback) {
 
         var description;
         var videoUrls = [];
+        var enclosure = {};
 
         if (page.areas.body) { // bc for 0.4
           description = self._apos._aposLocals.aposAreaContent(page.areas.body.items, {allowed:['richText', 'slideshow', 'blockquote']});
@@ -146,6 +147,7 @@ function Construct(options, callback) {
 
         if (videoUrls.length) {
           var videoEmbeds = self.getVideoEmbeds(videoUrls);
+          enclosure = {url:videoUrls[0]};
         }
 
         // description = description.concat(videoEmbeds);
@@ -153,11 +155,12 @@ function Construct(options, callback) {
         feed.item({
           title: page.title,
           description: description,
-          video: videoUrls,
+          enclosure: enclosure,
           categories: page.tags,
           date: page.publishedAt || page.start || page.createdAt,
           url: 'http://' + req.headers.host + '/apos-pages/search-result/?slug=' + page.slug
         });
+
       })
 
       // send to browser
