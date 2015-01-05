@@ -19,7 +19,7 @@
   "license": "MIT",
   "dependencies": {
     "lodash": "^2.4.1",
-    "rss": "^1.0.1",
+    "rss": "*",
     "cheerio": "^0.18.0"
   },
   "bugs": {

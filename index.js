@@ -2,7 +2,7 @@ module.exports = factory;
 
 var rss = require('rss');
 var _ = require('lodash');
-var $ = require('cheerio');
+// var $ = require('cheerio');
 
 function factory(options, callback) {
   return new Construct(options, callback);
@@ -125,7 +125,6 @@ function Construct(options, callback) {
         site_url: 'http://' + self._app.locals.hostName,
         feed_url: 'http://' + self._app.locals.hostName + req.url
       });
-      // console.log(self._apos._aposLocals);
 
       // loop page results and add them to the feed object
       results.pages.forEach(function(page) {
@@ -133,6 +132,9 @@ function Construct(options, callback) {
         var description;
         var videoUrls = [];
         var enclosure = {};
+        var thumbnail;
+        var custom;
+
 
         if (page.areas.body) { // bc for 0.4
           description = self._apos._aposLocals.aposAreaContent(page.areas.body.items, {allowed:['richText', 'slideshow', 'blockquote']});
@@ -144,13 +146,27 @@ function Construct(options, callback) {
           videoUrls = self.getVideoUrls(page.body.items);
         }
 
+        if (page.areas.thumbnail && page.areas.thumbnail.items.length) {
+          thumbnail = self._apos._aposLocals.aposFilePath(page.areas.thumbnail.items[0]._items[0], { size: 'full' });
+        }
+
+        if (page.thumbnail && page.thumbnail.items.length) {
+          thumbnail = self._apos._aposLocals.aposFilePath(page.thumbnail.items[0]._items[0], { size: 'full' });
+        }
+
 
         if (videoUrls.length) {
           var videoEmbeds = self.getVideoEmbeds(videoUrls);
           enclosure = {url:videoUrls[0]};
         }
 
-        // description = description.concat(videoEmbeds);
+
+        // prep thumbnail format
+        if (thumbnail !== undefined) {
+          custom = {
+            'thumbnail': 'http://' + self._app.locals.hostName + thumbnail
+          }
+        }
 
         feed.item({
           title: page.title,
@@ -158,8 +174,11 @@ function Construct(options, callback) {
           enclosure: enclosure,
           categories: page.tags,
           date: page.publishedAt || page.start || page.createdAt,
-          url: 'http://' + req.headers.host + '/apos-pages/search-result/?slug=' + page.slug
+          url: 'http://' + req.headers.host + '/apos-pages/search-result/?slug=' + page.slug,
+          custom_elements: [custom]
         });
+
+
 
       })
 
