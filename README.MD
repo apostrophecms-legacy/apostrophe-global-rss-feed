@@ -1,3 +1,7 @@
+# ⛔️ **DEPRECATED** — do not use for new projects
+
+See [our current docs](https://docs.apostrophecms.org/)
+
 # apostrophe-global-rss-feed
 
 [![NPM](https://nodei.co/npm/apostrophe-global-rss-feed.png?mini=true)](https://nodei.co/npm/apostrophe-global-rss-feed/)
